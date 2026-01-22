@@ -1,59 +1,66 @@
-# .github/workflows/ci.yml
-
-name: Anchor CI & Release
+name: CI & Release
 
 on:
   push:
     branches: ["main"]
+    tags: ["v*"]
   pull_request:
     branches: ["main"]
 
 jobs:
   build_and_test:
-    name: Build & Test
+    name: Build & Verify
     runs-on: ubuntu-latest
     steps:
       # 1. 检出代码
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. 设置 Node.js 环境
-      - name: Setup Node.js 22.x
+      # 2. 安装 Rust 工具链
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+
+      # 3. 缓存 Rust 依赖
+      - name: Rust Cache
+        uses: swatinem/rust-cache@v2
+
+      # 4. 安装 Solana CLI (Agave)
+      - name: Install Solana CLI
+        run: |
+          sh -c "$(curl -sSfL https://release.anza.xyz/v2.1.10/install)"
+          echo "/home/runner/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
+
+      # 5. 编译合约 (On-chain Program)
+      - name: Build Program
+        run: cargo build-sbf --program-id deploy_out/blueshift_vault.so
+
+      # 6. 设置 Node.js 环境 (用于 Codama 和 TS 测试)
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "22.16.0"
-          cache: "pnpm"
 
-      # 3. 设置 PNPM (安装 pnpm 本身)
       - name: Setup PNPM
         uses: pnpm/action-setup@v4
         with:
           version: "10.8.1"
 
-      # 4. 缓存 pnpm 依赖，加快安装
-      - name: Cache pnpm store
-        uses: actions/cache@v4
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
+      # 7. 运行 Codama 代码生成校验
+      - name: Install JS Deps & Codegen
+        working-directory: ./clients
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm run generate
+          # 检查生成代码后是否有未提交的变更，确保 IDL 与代码同步
+          git diff --exit-code
 
-      - name: Verify Node.js Version
-        run: node -v # 应输出 v22.16.0
-
-      # 3. 安装客户端依赖
-      - name: Install JS dependencies
-        run: pnpm install --frozen-lockfile
-
-      # 4. 运行 Anchor 构建和测试
-      #    使用一体化 action，并传入您指定的最新版本号
-      - name: Build and Run Anchor Tests
-        uses: metadaoproject/anchor-test@v2.2
-        with:
-          anchor-version: "0.31.1"
-          solana-cli-version: "2.2.19"
-          node-version: "22"
+      # 8. 验证 Rust 客户端编译
+      - name: Verify Rust Client
+        working-directory: ./clients/src/generated/rust
+        run: cargo check
 
   release:
     name: Release
@@ -67,15 +74,21 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      # 使用项目根目录的 cliff.toml 生成日志
       - name: Generate a changelog
         uses: orhun/git-cliff-action@v4
         id: git-cliff
         with:
           config: cliff.toml
           args: --latest --strip header
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           name: ${{ github.ref_name }}
           body: ${{ steps.git-cliff.outputs.content }}
-          prerelease: contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc')
+          prerelease: |
+            ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
+          files: |
+            deploy_out/blueshift_vault.so
