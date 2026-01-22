@@ -35,7 +35,7 @@ jobs:
 
       # 5. 编译合约 (On-chain Program)
       - name: Build Program
-        run: cargo build-sbf --program-id deploy_out/blueshift_vault.so
+        run: cargo build-sbf
 
       # 6. 设置 Node.js 环境 (用于 Codama 和 TS 测试)
       - name: Setup Node.js
