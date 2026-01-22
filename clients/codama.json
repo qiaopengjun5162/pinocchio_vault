@@ -1,0 +1,28 @@
+{
+    "idl": "../idl/blueshift_vault.json",
+    "before": [],
+    "scripts": {
+        "ts": {
+            "from": "@codama/renderers-js",
+            "args": [
+                "./src/generated/ts"
+            ],
+            "options": {
+                "formatCode": true,
+                "deleteFolderBeforeRendering": true
+            }
+        },
+        "rust": {
+            "from": "@codama/renderers-rust",
+            "args": [
+                "./src/generated/rust/src/generated",
+                {
+                    "crateFolder": "./src/generated/rust",
+                    "formatCode": true,
+                    "deleteFolderBeforeRendering": true,
+                    "anchorTraits": false
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,32 @@
+{
+    "name": "clients",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "idl": "cd .. && shank idl -o idl -r .",
+        "generate": "ts-node codegen.ts",
+        "build-all": "pnpm run idl && npm run generate",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "type": "module",
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "packageManager": "pnpm@10.28.0",
+    "dependencies": {
+        "@codama/cli": "^1.4.4",
+        "@codama/nodes-from-anchor": "^1.3.8",
+        "@codama/renderers-js": "^1.5.5",
+        "@codama/renderers-rust": "^1.2.9",
+        "@solana/web3.js": "^2.0.0",
+        "codama": "^1.5.0",
+        "dotenv": "^17.2.3",
+        "gill": "^0.14.0"
+    },
+    "devDependencies": {
+        "@types/node": "^25.0.10",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.9.3"
+    }
+}
