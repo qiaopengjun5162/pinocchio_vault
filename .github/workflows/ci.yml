@@ -30,7 +30,7 @@ jobs:
       # 4. 安装 Solana CLI (Agave)
       - name: Install Solana CLI
         run: |
-          sh -c "$(curl -sSfL https://release.anza.xyz/v2.1.10/install)"
+          sh -c "$(curl -sSfL https://release.anza.xyz/v3.1.7/install)"
           echo "/home/runner/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
 
       # 5. 编译合约 (On-chain Program)
