@@ -1,0 +1,11 @@
+{
+  "generator": "sol-transactions",
+  "state": {
+    "name": "pinocchio_vault_indexer",
+    "chainName": "solana-devnet",
+    "substreamsSinkChoice": "postgres",
+    "initialBlock": 440092945,
+    "initialBlockSet": true,
+    "filter": "program:A11gcDm7e8Pit4RiunfhtrK1BKU4oYAa3nx54R4YnFgS"
+  }
+}

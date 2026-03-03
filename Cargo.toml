@@ -8,9 +8,9 @@ crate-type = ["lib", "cdylib"]
 name = "blueshift_vault"
 
 [dependencies]
-pinocchio = { version = "0.10.1", features = ["cpi"] }
+pinocchio = { version = "0.10.2", features = ["cpi"] }
 pinocchio-system = "0.5.0"
-solana-address = { version = "2.0.0", features = ["curve25519"] }
+solana-address = { version = "2.1.0", features = ["curve25519"] }
 solana-program-log = "1.1.0"
 
 # 将 shank 和 borsh 设置为可选，并关闭默认 features

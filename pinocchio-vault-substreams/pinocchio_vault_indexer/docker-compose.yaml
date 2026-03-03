@@ -1,0 +1,33 @@
+services:
+  postgres:
+    container_name: postgres-substreams
+    image: postgres:17
+    ports:
+      - "5433:5432"
+    command: ["postgres", "-cshared_preload_libraries=pg_stat_statements"]
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: insecure
+      POSTGRES_DB: main
+      POSTGRES_INITDB_ARGS: "-E UTF8 --locale=C"
+      POSTGRES_HOST_AUTH_METHOD: md5
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 30s
+      timeout: 10s
+      retries: 15
+  pgweb:
+    container_name: pgweb-substreams
+    image: sosedoff/pgweb:0.16.1
+    restart: on-failure
+    ports:
+      - "8081:8081"
+    command: ["pgweb", "--bind=0.0.0.0", "--listen=8081", "--binary-codec=hex"]
+    links:
+      - postgres:postgres
+    environment:
+      - PGWEB_DATABASE_URL=postgres://dev:insecure@postgres:5432/main?sslmode=disable
+    depends_on:
+      - postgres

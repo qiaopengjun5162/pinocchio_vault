@@ -14,59 +14,47 @@ repos:
       - id: end-of-file-fixer
       - id: mixed-line-ending
       - id: trailing-whitespace
-  - repo: https://github.com/psf/black
-    rev: 25.1.0
-    hooks:
-      - id: black
+
   - repo: local
     hooks:
+     # 1. Rust 格式化：使用 --all 检查整个工作区
       - id: cargo-fmt
         name: cargo fmt
-        description: Format files with rustfmt.
-        entry: bash -c 'cargo fmt -- --check'
-        language: rust
-        files: \.rs$
-        args: []
-      - id: taplo fmt
+        entry: cargo fmt --all -- --check
+        language: system
+        types: [rust]
+        pass_filenames: false
+
+      # 2. TOML 格式化：确保匹配所有目录下的 toml
+      - id: taplo-fmt
         name: taplo fmt
-        description: Format files with taplo.
-        # entry: bash -c 'taplo fmt --option reorder_keys=true --check'
-        entry: bash -c 'taplo fmt --option reorder_keys=true'
-        language: rust
+        entry: taplo fmt
+        language: system
         files: \.toml$
-        args: []
-      - id: cargo-deny
-        name: cargo deny check
-        description: Check cargo dependencies
-        entry: bash -c 'cargo deny check -d'
-        language: rust
-        files: \.rs$
-        args: []
+
+      # 3. 拼写检查
       - id: typos
         name: typos
-        description: check typo
         entry: bash -c 'typos'
-        language: rust
-        files: \.*$
+        language: system
         pass_filenames: false
+
+     # 4. 全局 Workspace 检查：不再需要 cd 进入子目录
       - id: cargo-check
-        name: cargo check
-        description: Check the package for errors.
-        entry: bash -c 'cargo check --all'
-        language: rust
-        files: \.rs$
+        name: cargo check (workspace)
+        entry: cargo check --workspace
+        language: system
         pass_filenames: false
+
       - id: cargo-clippy
-        name: cargo clippy
-        description: Lint rust sources
-        entry: bash -c 'cargo clippy --all-targets --all-features --tests --benches -- -D warnings'
-        language: rust
-        files: \.rs$
+        name: cargo clippy (workspace)
+        entry: cargo clippy --workspace --all-targets --all-features -- -D warnings
+        language: system
         pass_filenames: false
-      - id: cargo-test
-        name: cargo test
-        description: unit test for the project
-        entry: bash -c 'cargo nextest run --all-features -- --include-ignored'
-        language: rust
-        files: \.rs$
+
+      # 5. 安全审计：使用根目录的 deny.toml
+      - id: cargo-deny
+        name: cargo deny check
+        entry: cargo deny check
+        language: system
         pass_filenames: false

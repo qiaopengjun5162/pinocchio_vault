@@ -1,10 +1,24 @@
+-include .env
+export
+
 # --- 项目配置 ---
 PROGRAM_NAME := blueshift_vault
 CLUSTER ?= localnet
 WALLET ?= ~/.config/solana/id.json
-RPC_URL_localnet := http://localhost:8899
-RPC_URL_devnet := https://api.devnet.solana.com
-RPC_URL := $(RPC_URL_$(CLUSTER))
+LOCALNET_RPC_URL := http://localhost:8899
+DEVNET_RPC_URL ?= https://api.devnet.solana.com
+MAINNET_RPC_URL ?= https://api.mainnet-beta.solana.com
+
+# Automatically select the RPC URL based on the CLUSTER variable.
+ifeq ($(CLUSTER), localnet)
+    RPC_URL := $(LOCALNET_RPC_URL)
+else ifeq ($(CLUSTER), devnet)
+    RPC_URL := $(DEVNET_RPC_URL)
+else ifeq ($(CLUSTER), mainnet-beta)
+    RPC_URL := $(MAINNET_RPC_URL)
+else
+    $(error Invalid CLUSTER specified. Use localnet, devnet, or mainnet-beta)
+endif
 
 # 路径定义
 IDL_DIR := ./idl

@@ -1,0 +1,54 @@
+specVersion: v0.1.0
+package:
+  name: pinocchio_vault_indexer
+  version: v0.1.0
+  url: https://github.com/username/pinocchio_vault_indexer-solana-devnet
+  description: Substreams module for pinocchio_vault_indexer on Solana Devnet
+
+imports:
+  solana: https://spkg.io/streamingfast/solana-common-v0.3.3.spkg
+
+protobuf:
+  files:
+    - mydata.proto
+    - database_changes.proto
+  importPaths:
+    - ./proto
+  excludePaths:
+    - sf/substreams/rpc
+    - sf/substreams/v1
+    - sf/substreams/sink
+    - sf/substreams/index
+    - sf/substreams/index/v1
+    - instructions.proto # sol.instructions.v1 from the v0.2.0 spkg
+    - transactions.proto # sol.transactions.v1 from the v0.2.0 spkg
+    - google
+
+binaries:
+  default:
+    type: wasm/rust-v1+wasm-bindgen-shims
+    file: ./target/wasm32-unknown-unknown/release/substreams.wasm
+
+modules:
+  - name: map_filtered_transactions
+    use: solana:transactions_by_programid_without_votes
+    initialBlock: 440092945
+
+  - name: map_program_data
+    kind: map
+    initialBlock: 440092945
+    inputs:
+    # - map: map_filtered_transactions
+    - source: sf.solana.type.v1.Block
+    output:
+    #  type: proto:pinocchio_vault.v1.Events
+     type: proto:sf.substreams.sink.database.v1.DatabaseChanges
+
+network: solana-devnet
+
+params:
+  map_filtered_transactions: program:A11gcDm7e8Pit4RiunfhtrK1BKU4oYAa3nx54R4YnFgS
+
+sink:
+  module: map_program_data
+  type: sf.substreams.sink.database.v1.DatabaseChanges

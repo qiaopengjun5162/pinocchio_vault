@@ -1,5 +1,8 @@
 # Pinocchio Vault 🤥
 
+![Rust](https://img.shields.io/badge/Rust-1.92.0-orange?logo=rust)
+![License](https://img.shields.io/badge/License-MIT-blue)
+
 **Pinocchio Vault** 是一个高度模块化的 Solana 智能合约项目，旨在展示如何使用现代 Solana 开发范式构建安全的资金存取库。项目不仅包含高效的 Rust 合约，还通过 **Codama** (原 Kinobi) 实现了从 IDL 到多语言客户端（TypeScript & Rust）的自动化代码生成。
 
 ## 🌟 项目亮点

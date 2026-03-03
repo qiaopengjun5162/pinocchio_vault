@@ -14,11 +14,12 @@ import { BLUESHIFT_VAULT_PROGRAM_ADDRESS } from "./src/generated/js/programs/blu
 import path from "path"
 
 // --- 1. 配置 ---
-const RPC_URL = "http://127.0.0.1:8899"
+// const RPC_URL = "http://127.0.0.1:8899"
+const RPC_URL = process.env.DEVNET_RPC_URL ?? "http://127.0.0.1:8899"
 const WALLET_PATH = path.join(process.env.HOME!, ".config/solana/id.json")
 // 填入你 make deploy 得到的真实 Program ID
-const MY_PROGRAM_ID = address("A11gcDm7e8Pit4RiunfhtrK1BKU4oYAa3nx54R4YnFgS")
-
+// const MY_PROGRAM_ID = address("A11gcDm7e8Pit4RiunfhtrK1BKU4oYAa3nx54R4YnFgS")
+const MY_PROGRAM_ID = address(process.env.PROGRAM_ID ?? "A11gcDm7e8Pit4RiunfhtrK1BKU4oYAa3nx54R4YnFgS")
 async function main() {
     console.log("🚀 Starting Blueshift Vault Test...")
 

@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package pinocchio_vault.v1; // 建议改个更有辨识度的包名
+
+message Events {
+    repeated Deposit deposit_events = 1;
+    repeated Withdraw withdraw_events = 2;
+}
+
+message Deposit {
+    string owner = 1;
+    string vault = 2;
+    uint64 amount = 3;
+    string tx_hash = 4;
+}
+
+message Withdraw {
+    string owner = 1;
+    string vault = 2;
+    string tx_hash = 3;
+}
